@@ -79,20 +79,18 @@ document.addEventListener('DOMContentLoaded', () => {
             toastMsg.classList.add('show');
             setTimeout(() => toastMsg.classList.remove('show'), 2000); // Desaparece a los 2 segundos
         }
-
-     window.addToCart = function(id, nombre, qty) {
-    // SOPORTE HÍBRIDO: Si el primer argumento es un objeto, lo tratamos como el nuevo formato
+window.addToCart = function(id, nombre, qty) {
+    // 1. SOPORTE HÍBRIDO
     let itemData;
     if (typeof id === 'object') {
-        itemData = id; // El objeto es el primer argumento
+        itemData = id;
     } else {
-        // Formato antiguo: reconstruimos el objeto
         itemData = { id: id, nombre: nombre, qty: qty };
     }
 
     let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
     
-    // Idempotencia: usamos String para comparar bien
+    // 2. Lógica de guardado
     let existingItem = cart.find(i => String(i.id) === String(itemData.id));
     
     if (existingItem) {
@@ -102,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
             id: itemData.id,
             nombre: itemData.nombre,
             qty: parseInt(itemData.qty),
-            // Guardamos campos extra si existen
             variant: itemData.variant || null,
             image: itemData.image || null
         });
@@ -110,14 +107,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     localStorage.setItem('geekwave_cart', JSON.stringify(cart));
     
-    // Actualizar UI
+    // 3. ACTUALIZACIÓN INMEDIATA DE UI
+    // Actualizamos el contador del badge
     if (typeof updateCartBadge === 'function') updateCartBadge();
-    if (typeof renderCart === 'function') renderCart();
     
-    // Feedback visual
+    // FORZAMOS EL RENDERIZADO DEL DROPDOWN
+    // Si el elemento existe en el DOM (estás en una página con Navbar), se renderizará
+    if (typeof renderCart === 'function') {
+        renderCart(); 
+    }
+    
+    // 4. Feedback visual
     if (typeof showToast === 'function') showToast();
 };
-
  // Cambiar cantidad en el carrito directamente (+ o -)
         window.changeCartQty = function(id, delta) {
             let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];

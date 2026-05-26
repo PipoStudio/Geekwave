@@ -304,26 +304,23 @@ function updateQuantityUI() {
     productState.quantity;
 }
 
-
+// En tu js/info.js, asegúrate de que la función sea esta y nada más:
 function addToCart() {
-  const currentVariant = productData.variants[productState.selectedVariant];
-  const finalPrice = productState.selectedPlan === "bundle" ? productData.bundlePrice : productData.basePrice;
+  const currentFlavor = productData.flavors[selectedFlavor]; // Asegúrate que esto coincida con tus variables
+  const finalPrice = productData.plans[selectedPlan].price;
 
-  // Objeto unificado
-  const cartItem = {
-    id: `${productData.id}-${currentVariant.id}-${productState.selectedPlan}`, 
-    nombre: productData.title, // 'nombre' es lo que espera navbar-global.js
-    qty: productState.quantity, // 'qty' es lo que espera navbar-global.js
-    variant: currentVariant.name,
-    price: finalPrice,
-    image: currentVariant.image
+  // Creamos el objeto limpio que espera el navbar
+  const itemData = {
+    id: `analogue-pocket-${selectedFlavor}-${selectedPlan}`,
+    nombre: `Analogue Pocket - ${currentFlavor.name}`,
+    qty: quantity,
+    image: currentFlavor.main
   };
 
+  // LLAMADA AL MOTOR CENTRAL
   if (typeof window.addToCart === "function") {
-    // Pasamos el objeto completo, no solo partes
-    window.addToCart(cartItem); 
+    window.addToCart(itemData); // Pasamos el objeto, el navbar ya sabe manejarlo
   }
-  buttonSuccessFeedback();
 }
 /* =========================================================
    ADD TO CART
