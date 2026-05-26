@@ -185,6 +185,12 @@
         </div>
     </div>
 
+    <div id="transition-overlay" class="transition-overlay">
+    <div class="transition-content">
+        <h2 class="transition-text">Sincronización completa.<br>Procesando pedido seguro...</h2>
+        <div class="apple-spinner"></div>
+    </div>
+</div>
     <script>
         const payFields = document.getElementById('payment-fields');
         const mainBtn = document.getElementById('mainActionBtn');
@@ -235,11 +241,8 @@
         updatePayment('card', document.querySelector('.select-card'));
     </script>
 
-<div id="transition-overlay" class="transition-overlay">
-    <div class="transition-content">
-        <h2 class="transition-text">Sincronización completa.<br>Procesando pedido seguro...</h2>
-        <div class="apple-spinner"></div>
-    </div>
-</div>
+
+<script src="js/navbar-global.js"></script>
+<script src="js/info.js"></script>
 </body>
 </html>

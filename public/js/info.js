@@ -207,3 +207,24 @@ document.querySelectorAll(".plan").forEach(planCard => {
 // En renderSelectors(), añade el scroll al evento click de los botones de chasis
 // Dentro de tu bucle de flavors:
 // button.onclick = () => { selectedFlavor = key; updateUI(); scrollToPurchase(); };
+
+
+// Captura la cantidad real del selector antes de añadir al carrito
+function getSelectedQuantity() {
+    const qtyElement = document.querySelector('.qty-num');
+    return qtyElement ? parseInt(qtyElement.textContent) : 1;
+}
+
+// Función que debe llamar tu botón "Añadir al carrito"
+function handleAddToCart() {
+    const cantidad = getSelectedQuantity();
+    const productoId = "analogue-pocket"; // Asegúrate que sea el ID correcto
+    const nombre = "Analogue Pocket";
+    
+    // Llamamos al motor global que vive en navbar-global.js
+    if (typeof window.addToCart === 'function') {
+        window.addToCart(productoId, nombre, cantidad);
+    } else {
+        console.error("addToCart no está definido");
+    }
+}
