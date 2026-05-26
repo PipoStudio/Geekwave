@@ -108,27 +108,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if(searchInput) searchInput.focus();
     };
 
-    window.changeCartQty = function(id, delta) {
-        let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
-        let item = cart.find(i => parseInt(i.id) === parseInt(id));
-        if(item) {
-            item.qty += delta;
-            if(item.qty < 1) item.qty = 1;
-        }
-        localStorage.setItem('geekwave_cart', JSON.stringify(cart));
-        updateCartBadge();
-        renderCart();
-    };
+  window.changeCartQty = function(id, delta) {
+    let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
+    
+    // Quitamos parseInt para que acepte tanto números como strings (ej: "1" o "analogue-pocket...")
+    let item = cart.find(i => String(i.id) === String(id));
+    
+    if(item) {
+        item.qty += delta;
+        if(item.qty < 1) item.qty = 1;
+    }
+    localStorage.setItem('geekwave_cart', JSON.stringify(cart));
+    updateCartBadge();
+    renderCart();
+};
 
-    window.removeFromCart = function(id) {
-        let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
-        cart = cart.filter(i => parseInt(i.id) !== parseInt(id));
-        localStorage.setItem('geekwave_cart', JSON.stringify(cart));
-        updateCartBadge();
-        renderCart();
-        showToast();
-    };
-
+window.removeFromCart = function(id) {
+    let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
+    
+    // Quitamos parseInt para comparar los IDs tal cual son
+    cart = cart.filter(i => String(i.id) !== String(id));
+    
+    localStorage.setItem('geekwave_cart', JSON.stringify(cart));
+    updateCartBadge();
+    renderCart();
+    showToast();
+};
     function renderCart() {
         let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
         const checkoutBtn = document.querySelector('.cart-footer .btn-primary');

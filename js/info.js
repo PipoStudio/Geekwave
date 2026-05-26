@@ -307,79 +307,45 @@ function updateQuantityUI() {
 /* =========================================================
    ADD TO CART
 ========================================================= */
-
 function addToCart() {
-  const currentVariant =
-    productData.variants[
-      productState.selectedVariant
-    ];
-
-  const finalPrice =
-    productState.selectedPlan === "bundle"
+  const currentVariant = productData.variants[productState.selectedVariant];
+  const finalPrice = productState.selectedPlan === "bundle"
       ? productData.bundlePrice
       : productData.basePrice;
 
   const cartItem = {
-    id:
-      `${productData.id}-${currentVariant.id}-${productState.selectedPlan}`,
-
-    productId: productData.id,
-
-    title: productData.title,
-
+    id: `${productData.id}-${currentVariant.id}-${productState.selectedPlan}`,
+    nombre: productData.title,
+    qty: productState.quantity,
+    // Datos extra que el carrito global no guarda, pero que tú necesitas:
     variant: currentVariant.name,
-
     variantId: currentVariant.id,
-
     image: currentVariant.image,
-
     plan: productState.selectedPlan,
-
-    quantity: productState.quantity,
-
     price: finalPrice,
-
-    total:
-      finalPrice *
-      productState.quantity,
+    total: finalPrice * productState.quantity
   };
 
-  /* =====================================================
-     INTEGRACIÓN CON TU SISTEMA EXISTENTE
-  ===================================================== */
+  if (typeof window.addToCart === "function") {
+    // 1. Llamamos a la función global para el contador y animación
+    window.addToCart(cartItem.id, cartItem.nombre, cartItem.qty);
 
-  /*
-     Si ya tienes addToCart global
-  */
-
-  if (
-    typeof window.addToCart === "function"
-  ) {
-    window.addToCart(cartItem);
-  }
-
-  /*
-     Si tienes otro nombre de función
-  */
-
-  else if (
-    typeof window.handleAddToCart ===
-    "function"
-  ) {
-    window.handleAddToCart(cartItem);
-  }
-
-  /*
-     FALLBACK UNIVERSAL
-  */
-
-  else {
+    // 2. CORRECCIÓN CRÍTICA: Actualizamos los datos extra en localStorage manualmente
+    // porque tu función global no conoce estos campos.
+    let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
+    let item = cart.find(i => String(i.id) === String(cartItem.id));
+    
+    if (item) {
+        // Actualizamos los campos extra en el objeto existente
+        Object.assign(item, cartItem);
+        localStorage.setItem('geekwave_cart', JSON.stringify(cart));
+    }
+  } else {
     fallbackCartSystem(cartItem);
   }
 
   buttonSuccessFeedback();
 }
-
 /* =========================================================
    FALLBACK CART SYSTEM
 ========================================================= */
