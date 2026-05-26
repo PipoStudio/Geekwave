@@ -80,17 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => toastMsg.classList.remove('show'), 2000); // Desaparece a los 2 segundos
         }
 window.addToCart = function(id, nombre, qty) {
-    // 1. SOPORTE HÍBRIDO
+    // 1. SOPORTE HÍBRIDO: Identifica si recibes un objeto o valores sueltos
     let itemData;
     if (typeof id === 'object') {
-        itemData = id;
+        itemData = id; 
     } else {
         itemData = { id: id, nombre: nombre, qty: qty };
     }
 
+    // 2. Obtener carrito actual
     let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
     
-    // 2. Lógica de guardado
+    // 3. Lógica de guardado (Idempotencia)
     let existingItem = cart.find(i => String(i.id) === String(itemData.id));
     
     if (existingItem) {
@@ -105,19 +106,20 @@ window.addToCart = function(id, nombre, qty) {
         });
     }
     
+    // 4. Guardar en almacenamiento
     localStorage.setItem('geekwave_cart', JSON.stringify(cart));
     
-    // 3. ACTUALIZACIÓN INMEDIATA DE UI
-    // Actualizamos el contador del badge
+    // 5. SINCRONIZACIÓN INMEDIATA DE LA INTERFAZ
+    // Actualizamos el contador del badge (si existe)
     if (typeof updateCartBadge === 'function') updateCartBadge();
     
-    // FORZAMOS EL RENDERIZADO DEL DROPDOWN
-    // Si el elemento existe en el DOM (estás en una página con Navbar), se renderizará
+    // Forzamos el renderizado del dropdown para que el usuario vea el cambio al instante
+    // Esto funciona porque renderCart lee el localStorage que acabamos de actualizar
     if (typeof renderCart === 'function') {
         renderCart(); 
     }
     
-    // 4. Feedback visual
+    // 6. Feedback visual al usuario
     if (typeof showToast === 'function') showToast();
 };
  // Cambiar cantidad en el carrito directamente (+ o -)
