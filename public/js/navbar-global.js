@@ -80,19 +80,43 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => toastMsg.classList.remove('show'), 2000); // Desaparece a los 2 segundos
         }
 
-      window.addToCart = function(id, nombre, qty) {
-            let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
-            let existingItem = cart.find(item => parseInt(item.id) === parseInt(id));
-            if (existingItem) {
-                existingItem.qty += parseInt(qty);
-            } else {
-                cart.push({ id: id, nombre: nombre, qty: parseInt(qty) });
-            }
-            localStorage.setItem('geekwave_cart', JSON.stringify(cart));
-            updateCartBadge();
-            if(cartDropdown && cartDropdown.classList.contains('show')) renderCart();
-            if(searchInput) searchInput.focus();
-        };
+     window.addToCart = function(id, nombre, qty) {
+    // SOPORTE HÍBRIDO: Si el primer argumento es un objeto, lo tratamos como el nuevo formato
+    let itemData;
+    if (typeof id === 'object') {
+        itemData = id; // El objeto es el primer argumento
+    } else {
+        // Formato antiguo: reconstruimos el objeto
+        itemData = { id: id, nombre: nombre, qty: qty };
+    }
+
+    let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
+    
+    // Idempotencia: usamos String para comparar bien
+    let existingItem = cart.find(i => String(i.id) === String(itemData.id));
+    
+    if (existingItem) {
+        existingItem.qty = parseInt(existingItem.qty) + parseInt(itemData.qty);
+    } else {
+        cart.push({
+            id: itemData.id,
+            nombre: itemData.nombre,
+            qty: parseInt(itemData.qty),
+            // Guardamos campos extra si existen
+            variant: itemData.variant || null,
+            image: itemData.image || null
+        });
+    }
+    
+    localStorage.setItem('geekwave_cart', JSON.stringify(cart));
+    
+    // Actualizar UI
+    if (typeof updateCartBadge === 'function') updateCartBadge();
+    if (typeof renderCart === 'function') renderCart();
+    
+    // Feedback visual
+    if (typeof showToast === 'function') showToast();
+};
 
  // Cambiar cantidad en el carrito directamente (+ o -)
         window.changeCartQty = function(id, delta) {

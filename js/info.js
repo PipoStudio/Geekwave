@@ -304,49 +304,34 @@ function updateQuantityUI() {
     productState.quantity;
 }
 
-/* =========================================================
-   ADD TO CART
-========================================================= */
+
 function addToCart() {
   const currentVariant = productData.variants[productState.selectedVariant];
-  const finalPrice = productState.selectedPlan === "bundle"
-      ? productData.bundlePrice
-      : productData.basePrice;
+  const finalPrice = productState.selectedPlan === "bundle" ? productData.bundlePrice : productData.basePrice;
 
+  // Objeto unificado
   const cartItem = {
-    id: `${productData.id}-${currentVariant.id}-${productState.selectedPlan}`,
-    nombre: productData.title,
-    qty: productState.quantity,
-    // Datos extra que el carrito global no guarda, pero que tú necesitas:
+    id: `${productData.id}-${currentVariant.id}-${productState.selectedPlan}`, 
+    nombre: productData.title, // 'nombre' es lo que espera navbar-global.js
+    qty: productState.quantity, // 'qty' es lo que espera navbar-global.js
     variant: currentVariant.name,
-    variantId: currentVariant.id,
-    image: currentVariant.image,
-    plan: productState.selectedPlan,
     price: finalPrice,
-    total: finalPrice * productState.quantity
+    image: currentVariant.image
   };
 
   if (typeof window.addToCart === "function") {
-    // 1. Llamamos a la función global para el contador y animación
-    window.addToCart(cartItem.id, cartItem.nombre, cartItem.qty);
-
-    // 2. CORRECCIÓN CRÍTICA: Actualizamos los datos extra en localStorage manualmente
-    // porque tu función global no conoce estos campos.
-    let cart = JSON.parse(localStorage.getItem('geekwave_cart')) || [];
-    let item = cart.find(i => String(i.id) === String(cartItem.id));
-    
-    if (item) {
-        // Actualizamos los campos extra en el objeto existente
-        Object.assign(item, cartItem);
-        localStorage.setItem('geekwave_cart', JSON.stringify(cart));
-    }
-  } else {
-    fallbackCartSystem(cartItem);
+    // Pasamos el objeto completo, no solo partes
+    window.addToCart(cartItem); 
   }
-
   buttonSuccessFeedback();
 }
 /* =========================================================
+   ADD TO CART
+
+   
+/* =========================================================
+
+
    FALLBACK CART SYSTEM
 ========================================================= */
 
